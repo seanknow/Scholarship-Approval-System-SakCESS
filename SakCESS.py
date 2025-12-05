@@ -15,7 +15,7 @@ import tkinter as tk
 import mysql.connector
 from tkinter import messagebox, simpledialog, ttk
 
-def connect_db():
+def connect_db():  #connect to database
     try:
         db = mysql.connector.connect(
             host="localhost",
@@ -66,20 +66,19 @@ def show_form():
     form_bg_photo = ImageTk.PhotoImage(form_bg_image.resize((1280, 720)))
     bg_label.config(image=form_bg_photo)
     bg_label.image = form_bg_photo   # keep reference
-
-    form_frame.place(relx=0.5, rely=0.5, anchor="center")
+    form_frame.place(relx=0.5, rely=0.5, anchor="center")  #frame size (form)
 
 # apply button
-apply_btn = tk.Button(root, text="Apply Now", font=("System", 18), bg="white", width=15, height=1, command=show_form)
+apply_btn = tk.Button(root, text="Apply Now", font=("System", 18), bg="light blue", width=15, height=1, command=show_form)
 apply_btn.place(relx=0.5, rely=0.8, anchor="center")
 
 # properties and attr of frame 2
-form_frame = tk.Frame(root, bg="lightskyblue", width=1000, height=700, highlightbackground="black", highlightthickness=2)
+form_frame = tk.Frame(root, bg="lightskyblue", width=1000, height=700, highlightbackground="black", highlightthickness=2) #form properties
 
 fields = [
     "SCODE", "FULL NAME", "AGE", "BIRTHDATE", "ADDRESS", "EMAIL ADDRESS",
     "CONTACT NO.", "SCHOOL/UNIVERSITY", "COURSE", "YEAR LEVEL", "GWA"
-] # list of fields (nakabase sa database. )
+] # list of fields (nakabase at align sa database)
 
 entries = {}
 label_font = ("System", 14)
@@ -87,17 +86,17 @@ label_font = ("System", 14)
 # formation of fields 
 for idx, field in enumerate(fields):
     # label
-    label = tk.Label(form_frame, text=f"{field}:", font=label_font, bg="white", anchor="e", width=20, relief ="solid")
+    label = tk.Label(form_frame, text=f"{field}:", font=label_font, bg="white", anchor="w", width=20, relief ="solid") #label form properties
     label.grid(row=idx, column=0, sticky="e", padx=(10, 5), pady=3)
     
-    # entry
+    # entry (input box)
     entry = tk.Entry(form_frame, font=label_font, width=80, bg="white", relief="sunken")
-    entry.grid(row=idx, column=1, sticky="we", padx=(10,10), pady=3)
+    entry.grid(row=idx, column=1, sticky="w", padx=(10,10), pady=3)
     entries[field] = entry
     
 def submit_form():
     for field, entry in entries.items():
-        if entry.get().strip() == "": # check if meron laman
+        if entry.get().strip() == "": # check if meron laman 
             messagebox.showwarning("Invalid Input", f"Please fill in {field}!")
             return  # stop function kung may empty
     
@@ -126,31 +125,32 @@ def submit_form():
             entries["YEAR LEVEL"].get(),
             entries["GWA"].get()
         ))
-        db.commit()
+        db.commit() # save changes
         messagebox.showinfo("APPLICATION SUBMITTED", "SUBMITTED! Your Application is under Evaluation.")
         show_list()  # punta sa list of students frame
 
-    except Exception as e: # ito ay kapag erro sa database
+    except Exception as e: # ito ay kapag error sa database
         messagebox.showerror("Error", f"Database error: {e}")
     finally: # close (para masiguro)
         cursor.close()
         db.close()
 
-# submit button 
-submit_btn = tk.Button(form_frame, text="SUBMIT", font=("System", 18), bg="light blue", width=20, command=submit_form)
+# submit button properties
+submit_btn = tk.Button(form_frame, text="SUBMIT", font=("System", 18), bg="light blue", width=20, command=submit_form, relief="raised") 
 submit_btn.grid(row=len(fields), column=1, pady=15)
 
 
 
 # list of students (frame 3)
 
-list_frame = tk.Frame(root, bg="white")
+list_frame = tk.Frame(root, bg="light gray") #list of students frame properties
 
-list_container = tk.Frame(list_frame, bg="white")
+# treeview (table) container
+list_container = tk.Frame(list_frame, bg="white") 
 list_container.pack(fill="both", expand=True, padx=10, pady=10)
 
 columns = ("scode", "student_name", "student_address", "school", "course", "year_lvl", "gwa")
-tree = ttk.Treeview(list_container, columns=columns, show="headings", height=15)
+tree = ttk.Treeview(list_container, columns=columns, show="headings", height=25)
 
 for col, heading in zip(columns, ["SCODE", "FULL NAME", "ADDRESS", "SCHOOL/UNIV", "COURSE", "YEAR LEVEL", "GWA"]):
     tree.heading(col, text=heading, anchor="center")
@@ -161,7 +161,6 @@ tree.pack(fill="both", expand=True)
 # load list of student 
 
 def load_list():
-    """Load all student records into the Treeview"""
     # Clear existing items
     for item in tree.get_children():
         tree.delete(item)
@@ -215,12 +214,12 @@ def delete_scode():
 
 
 # scode entry box for delete
-scode_entry = tk.Entry(list_frame, font=("System", 16), width=30)
+scode_entry = tk.Entry(list_frame, font=("System", 16), width=30) #size ng box to enter scode
 scode_entry.pack(pady=10)
 
 # delete button
-delete_button = tk.Button(list_frame, text="Delete", font=("System", 16), bg="lightblue", command=delete_scode)
-delete_button.pack(pady=10)
+delete_button = tk.Button(list_frame, text="Delete", font=("System", 16), bg="lightblue", width=15, height=2, command=delete_scode)
+delete_button.pack(pady=(0, 10))
 
 
 # update function
@@ -297,7 +296,7 @@ def update_scode():
     gwa_entry.insert(0, curr_gwa)
     gwa_entry.place(relx=0.6, rely=0.75, anchor="c")
 
-    # SAVE FUNCTION
+    # save function
     def save_update():
         new_name = name_entry.get().strip()
         new_address = address_entry.get().strip()
@@ -326,9 +325,9 @@ def update_scode():
     tk.Button(update_win, text="Save Changes", bg="lightgreen", fg="black", font=("Arial", 14),
                relief="raised", bd=2, command=save_update).place(relx=0.5, rely=0.86, anchor="center")
 
-# UPDATE BUTTON
-update_button = tk.Button(list_frame, text="Update", font=("Arial", 16), bg="lightgreen", command=update_scode)
-update_button.pack(pady=10)
+# update button
+update_button = tk.Button(list_frame, text="Update", font=("System", 16), bg="lightgreen", width=15, height=2, command=update_scode)
+update_button.pack(pady=(0, 10))
 
 
 root.mainloop()
